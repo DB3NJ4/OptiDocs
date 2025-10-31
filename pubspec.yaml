@@ -1,0 +1,36 @@
+name: optidocs_app
+description: "Aplicación para gestionar PDFs con Firebase"
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+version: 1.0.0+1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+
+  # Firebase
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.17.3
+  cloud_firestore: ^4.13.0
+  firebase_storage: ^11.5.7
+
+  # State Management - AGREGAR ESTA LÍNEA
+  provider: ^6.1.1
+
+  # Manejo de archivos PDF
+  file_picker: ^5.5.0
+  permission_handler: ^11.0.1
+  open_file: ^3.3.3
+  path_provider: ^2.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
