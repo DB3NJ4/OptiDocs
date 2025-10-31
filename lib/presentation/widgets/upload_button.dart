@@ -1,69 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 import '../providers/pdf_provider.dart';
-import '../../core/utils/file_utils.dart';
-import '../../core/constants/app_constants.dart';
+import '../../core/theme/colors.dart';
 
 class UploadButton extends StatelessWidget {
   const UploadButton({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () => _pickAndUploadPDF(context),
-      backgroundColor: Colors.blue,
-      foregroundColor: Colors.white,
-      child: const Icon(Icons.add),
-    );
-  }
-
-  Future<void> _pickAndUploadPDF(BuildContext context) async {
+  void _pickAndUploadFile(BuildContext context) async {
     final pdfProvider = Provider.of<PDFProvider>(context, listen: false);
 
     try {
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: AppConstants.allowedExtensions,
+        allowedExtensions: ['pdf'],
+        withData: true, // ✅ IMPORTANTE para web
       );
 
-      if (result != null && result.files.single.bytes != null) {
+      if (result != null && result.files.isNotEmpty) {
         final file = result.files.single;
 
-        if (!FileUtils.isValidPDF(file)) {
-          _showErrorDialog(context,
-              'Archivo no válido. Asegúrate de que sea un PDF y no exceda los 50MB.');
-          return;
-        }
+        if (file.bytes != null) {
+          await pdfProvider.uploadPDF(file);
 
-        await pdfProvider.uploadPDF(file);
-
-        if (pdfProvider.error == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('PDF "${file.name}" subido exitosamente'),
+              content: Text('✅ "${file.name}" subido exitosamente'),
               backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
             ),
           );
+        } else {
+          throw Exception('No se pudieron leer los datos del archivo');
         }
       }
     } catch (e) {
-      _showErrorDialog(context, 'Error al subir PDF: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al subir archivo: $e'),
+          backgroundColor: AppColors.error,
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 
-  void _showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Error'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () => _pickAndUploadFile(context), // ✅ Nombre corregido
+      backgroundColor: AppColors.primary,
+      foregroundColor: AppColors.onPrimary,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Icon(
+        Icons.add,
+        size: 28,
       ),
     );
   }

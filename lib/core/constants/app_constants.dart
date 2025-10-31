@@ -10,4 +10,10 @@ class AppConstants {
   // Collections
   static const String pdfsCollection = 'pdfs';
   static const String usersCollection = 'users';
+
+  // Mensajes
+  static const String uploadSuccess = 'PDF subido exitosamente';
+  static const String uploadError = 'Error al subir PDF';
+  static const String deleteSuccess = 'PDF eliminado exitosamente';
+  static const String deleteError = 'Error al eliminar PDF';
 }

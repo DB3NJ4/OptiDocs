@@ -6,7 +6,7 @@ class PDFModel {
   final String url;
   final DateTime uploadDate;
   final int size;
-  final String? userId;
+  final String userId;
 
   PDFModel({
     required this.id,
@@ -14,17 +14,37 @@ class PDFModel {
     required this.url,
     required this.uploadDate,
     required this.size,
-    this.userId,
+    required this.userId,
   });
 
   factory PDFModel.fromMap(Map<String, dynamic> map) {
+    // Manejar diferentes formatos de fecha
+    Timestamp uploadDate;
+    if (map['uploadDate'] is Timestamp) {
+      uploadDate = map['uploadDate'] as Timestamp;
+    } else if (map['uploadDate'] is String) {
+      uploadDate = Timestamp.fromDate(DateTime.parse(map['uploadDate']));
+    } else {
+      uploadDate = Timestamp.now();
+    }
+
+    // Manejar diferentes formatos de tamaño
+    int size;
+    if (map['size'] is int) {
+      size = map['size'] as int;
+    } else if (map['size'] is String) {
+      size = int.tryParse(map['size']) ?? 0;
+    } else {
+      size = 0;
+    }
+
     return PDFModel(
-      id: map['id'] ?? '',
-      name: map['name'] ?? '',
-      url: map['url'] ?? '',
-      uploadDate: (map['uploadDate'] as Timestamp).toDate(),
-      size: map['size'] ?? 0,
-      userId: map['userId'],
+      id: map['id']?.toString() ?? '',
+      name: map['name']?.toString() ?? 'Sin nombre',
+      url: map['url']?.toString() ?? '',
+      uploadDate: uploadDate.toDate(),
+      size: size,
+      userId: map['userId']?.toString() ?? '',
     );
   }
 
@@ -37,5 +57,10 @@ class PDFModel {
       'size': size,
       'userId': userId,
     };
+  }
+
+  @override
+  String toString() {
+    return 'PDFModel{id: $id, name: $name, size: $size, userId: $userId}';
   }
 }
